@@ -1,0 +1,30 @@
+FROM golang:1.10.3-alpine
+
+WORKDIR /go/src/gitlab.com/k1476/scaffolding
+
+# Add the source code
+ENV SRC_DIR=/go/src/gitlab.com/k1476/scaffolding
+
+ENV BUILD_PACKAGES="git curl"
+
+ADD . $SRC_DIR
+
+RUN apk update && apk add --no-cache $BUILD_PACKAGES \
+  #&& apk add rsyslog \
+  #&& apk add supervisor \
+  #&& apk add tzdata \
+  && curl https://glide.sh/get | sh \
+  && glide install \
+  && apk del $BUILD_PACKAGES \
+  && CGO_ENABLED=0 GOOS=linux go build -ldflags '-w -s' -a -o my-app-linux .
+
+# Copy environment variable to source dir
+COPY .env $SRC_DIR.env
+#ADD supervisord.conf /etc/supervisord.conf
+
+EXPOSE 8080
+EXPOSE 8081
+
+#ENTRYPOINT ["sh", "-c", "supervisord -nc /etc/supervisord.conf"]
+
+ENTRYPOINT ["./my-app-linux"]
