@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Klinisia/backend-ksi/src/shared"
 	"github.com/google/go-querystring/query"
-	"gitlab.com/k1476/scaffolding/src/shared"
 )
 
 // NotifWhatsapp struct

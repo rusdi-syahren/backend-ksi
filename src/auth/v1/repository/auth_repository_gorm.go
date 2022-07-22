@@ -3,10 +3,10 @@ package repository
 import (
 	"errors"
 
+	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
+	"github.com/Klinisia/backend-ksi/src/shared"
 	"github.com/jinzhu/gorm"
-	"gitlab.com/k1476/scaffolding/src/auth/v1/domain"
-	"gitlab.com/k1476/scaffolding/src/auth/v1/dto"
-	"gitlab.com/k1476/scaffolding/src/shared"
 )
 
 // AuthRepositoryGorm struct

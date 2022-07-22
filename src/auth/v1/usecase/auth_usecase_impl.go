@@ -1,24 +1,21 @@
 package usecase
 
 import (
-	"gitlab.com/k1476/scaffolding/src/auth/v1/domain"
-	"gitlab.com/k1476/scaffolding/src/auth/v1/dto"
-	"gitlab.com/k1476/scaffolding/src/auth/v1/repository"
-	"gitlab.com/k1476/scaffolding/src/shared"
-	"gitlab.com/k1476/scaffolding/src/shared/external"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/repository"
+	"github.com/Klinisia/backend-ksi/src/shared"
 )
 
 // AuthUsecaseImpl struct
 type AuthUsecaseImpl struct {
 	AuthRepositoryWrite repository.AuthRepository
-	ext                 external.Notif
 }
 
 // NewAuthUsecaseImpl function
-func NewAuthUsecaseImpl(AuthRepositoryWrite repository.AuthRepository, ext external.Notif) *AuthUsecaseImpl {
+func NewAuthUsecaseImpl(AuthRepositoryWrite repository.AuthRepository) *AuthUsecaseImpl {
 	return &AuthUsecaseImpl{
 		AuthRepositoryWrite: AuthRepositoryWrite,
-		ext:                 ext,
 	}
 }
 

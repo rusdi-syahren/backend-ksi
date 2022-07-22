@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-	"gitlab.com/k1476/scaffolding/config"
-	"gitlab.com/k1476/scaffolding/config/database"
+	"github.com/Klinisia/backend-ksi/config"
+	"github.com/Klinisia/backend-ksi/config/database"
 )
 
 func main() {

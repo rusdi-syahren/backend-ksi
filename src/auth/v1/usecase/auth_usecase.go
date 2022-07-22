@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"gitlab.com/k1476/scaffolding/src/auth/v1/dto"
-	"gitlab.com/k1476/scaffolding/src/shared"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
+	"github.com/Klinisia/backend-ksi/src/shared"
 )
 
 // AuthUsecase interface

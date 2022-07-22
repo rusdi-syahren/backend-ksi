@@ -1,4 +1,4 @@
-# Scaffolding
+# backend-ksi
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.com/k1476/scaffolding.git
+git remote add origin https://github.com/Klinisia/backend-ksi.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:0d41729ca099b0ff452767b9979e25f2?https://gitlab.com/k1476/scaffolding/-/settings/integrations)
+- [ ] [Set up project integrations](https://gitlab.com/-/experiment/new_project_readme_content:0d41729ca099b0ff452767b9979e25f2?https://github.com/Klinisia/backend-ksi/-/settings/integrations)
 
 ## Collaborate with your team
 

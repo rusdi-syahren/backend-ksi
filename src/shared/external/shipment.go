@@ -1,8 +1,8 @@
 package external
 
 import (
+	"github.com/Klinisia/backend-ksi/src/shared"
 	"github.com/labstack/echo"
-	"gitlab.com/k1476/scaffolding/src/shared"
 )
 
 // Shipment interface

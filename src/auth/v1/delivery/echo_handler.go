@@ -3,10 +3,10 @@ package delivery
 import (
 	"net/http"
 
-	"gitlab.com/k1476/scaffolding/src/auth/v1/domain"
-	"gitlab.com/k1476/scaffolding/src/auth/v1/dto"
-	"gitlab.com/k1476/scaffolding/src/auth/v1/usecase"
-	"gitlab.com/k1476/scaffolding/src/shared"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/usecase"
+	"github.com/Klinisia/backend-ksi/src/shared"
 
 	"github.com/labstack/echo"
 )

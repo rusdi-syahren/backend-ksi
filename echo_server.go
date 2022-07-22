@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Klinisia/backend-ksi/config"
+	"github.com/Klinisia/backend-ksi/middleware"
 	"github.com/go-redis/redis"
-	"gitlab.com/k1476/scaffolding/config"
-	"gitlab.com/k1476/scaffolding/middleware"
 
-	authDeliveryPackage "gitlab.com/k1476/scaffolding/src/auth/v1/delivery"
-	authRepositoryPackage "gitlab.com/k1476/scaffolding/src/auth/v1/repository"
-	authUsecasePackage "gitlab.com/k1476/scaffolding/src/auth/v1/usecase"
-	"gitlab.com/k1476/scaffolding/src/shared/external"
+	authDeliveryPackage "github.com/Klinisia/backend-ksi/src/auth/v1/delivery"
+	authRepositoryPackage "github.com/Klinisia/backend-ksi/src/auth/v1/repository"
+	authUsecasePackage "github.com/Klinisia/backend-ksi/src/auth/v1/usecase"
 
 	"github.com/jinzhu/gorm"
 	"github.com/labstack/echo"
@@ -60,15 +59,10 @@ func (s *EchoServer) Run() {
 
 // NewEchoServer function
 func NewEchoServer(writeDb, readDb *gorm.DB, redisWrite *redis.Client) (*EchoServer, error) {
-	// trxservice
-	externalService, err := external.NewNotifWhatsapp()
-	if err != nil {
-		return nil, err
-	}
 
 	// auth
 	authRepositoryWrite := authRepositoryPackage.NewAuthRepositoryGorm(writeDb)
-	authUsecase := authUsecasePackage.NewAuthUsecaseImpl(authRepositoryWrite, externalService)
+	authUsecase := authUsecasePackage.NewAuthUsecaseImpl(authRepositoryWrite)
 	authEchoHandler := authDeliveryPackage.NewEchoHandler(authUsecase)
 
 	return &EchoServer{

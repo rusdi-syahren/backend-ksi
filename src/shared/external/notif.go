@@ -1,7 +1,7 @@
 package external
 
 import (
-	"gitlab.com/k1476/scaffolding/src/shared"
+	"github.com/Klinisia/backend-ksi/src/shared"
 )
 
 // Notif interface

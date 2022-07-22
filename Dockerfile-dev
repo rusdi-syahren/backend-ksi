@@ -1,9 +1,9 @@
 FROM golang:1.10.3-alpine
 
-WORKDIR /go/src/gitlab.com/k1476/scaffolding
+WORKDIR /go/src/github.com/Klinisia/backend-ksi
 
 # Add the source code
-ENV SRC_DIR=/go/src/gitlab.com/k1476/scaffolding
+ENV SRC_DIR=/go/src/github.com/Klinisia/backend-ksi
 
 ENV BUILD_PACKAGES="git curl"
 
