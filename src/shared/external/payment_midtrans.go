@@ -10,7 +10,7 @@ import (
 
 	"github.com/Klinisia/backend-ksi/src/shared"
 	"github.com/afex/hystrix-go/hystrix"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // PaymentMidtrans struct

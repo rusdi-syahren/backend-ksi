@@ -17,8 +17,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/labstack/echo"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
+	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
+	"github.com/beevik/etree"
+	"github.com/google/uuid"
+	"github.com/labstack/echo/v4"
 	"github.com/maddevsio/fcm"
+	"golang.org/x/crypto/bcrypt"
 
 	humanize "github.com/dustin/go-humanize"
 )
@@ -53,6 +58,17 @@ func StringInSlice(str string, list []string) bool {
 	return false
 }
 
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+
+	return err == nil
+}
+
 // HasPassword func
 func HasPassword(password string) string {
 	var sha = sha1.New()
@@ -65,12 +81,12 @@ func HasPassword(password string) string {
 
 // CheckPassword func
 func Check(password string, curentPassword string) bool {
+
 	result := false
-	// fmt.Printf(curentPassword)
-	// fmt.Printf(HasPassword(password))
 	if curentPassword == HasPassword(password) {
 		result = true
 	}
+
 	return result
 }
 
@@ -299,4 +315,71 @@ func ItemExists(arrayType interface{}, item interface{}) bool {
 	}
 
 	return false
+}
+
+func CrateJwtToken() error {
+	return nil
+}
+
+func AuthenticateUser(data *domain.SecUsers, request *dto.LoginByPhoneRequest) error {
+
+	if data.SecUserId == "" || data.IsDeleted {
+		return errors.New("Username atau password salah")
+	} else if !data.IsActive {
+		return errors.New("Account lock")
+	} else if data.AccountExpired {
+		return errors.New("Account expired")
+	} else if data.CredentialsExpired {
+		return errors.New("Credential expired")
+	} else if data.UserTypeCode == "admin" && data.HptHospitalID == "" {
+		return errors.New("invalid hospital")
+	} else if !CheckPasswordHash(request.Password, data.Password) {
+		return errors.New("Username atau password salah")
+	} else {
+		return nil
+	}
+
+}
+
+func GenerateUUID() string {
+	uuidWithHyphen := uuid.New()
+	uuid := strings.Replace(uuidWithHyphen.String(), "-", "", -1)
+	return uuid
+}
+
+func CreateSmsXmlRequest(params *AcsSmsRequest) string {
+	doc := etree.NewDocument()
+	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
+
+	smsbc := doc.CreateElement("smsbc")
+	request := smsbc.CreateElement("request")
+	request.CreateElement("datetime").SetText(params.SmsBc.Request.Datetime)
+	request.CreateElement("rrn").SetText(params.SmsBc.Request.Rrn)
+	request.CreateElement("partnerId").SetText(params.SmsBc.Request.PartnerId)
+	request.CreateElement("partnerName").SetText(params.SmsBc.Request.PartnerName)
+	request.CreateElement("password").SetText(params.SmsBc.Request.Password)
+	request.CreateElement("destinationNumber").SetText(params.SmsBc.Request.DestinationNumber)
+	request.CreateElement("message").SetText(params.SmsBc.Request.Message)
+	doc.Indent(2)
+
+	response, _ := doc.WriteToString()
+	return response
+}
+
+type AcsSmsRequest struct {
+	SmsBc AcsSmsReq `json:"smsbc" xml:"smsbc"`
+}
+
+type AcsSmsReq struct {
+	Request AcsSmsReqPayload `json:"request" xml:"request"`
+}
+
+type AcsSmsReqPayload struct {
+	Datetime          string `json:"datetime" xml:"smsType"`
+	Rrn               string `json:"rrn" xml:"rrn"`
+	PartnerId         string `json:"partnerId" url:"partnerId"`
+	PartnerName       string `json:"partnerName" url:"partnerName"`
+	Password          string `json:"password" url:"password"`
+	DestinationNumber string `json:"destinationNumber" url:"destinationNumber"`
+	Message           string `json:"message" url:"message"`
 }

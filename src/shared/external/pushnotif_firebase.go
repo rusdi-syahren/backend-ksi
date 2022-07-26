@@ -11,7 +11,7 @@ import (
 
 	"github.com/Klinisia/backend-ksi/src/shared"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 type response struct {

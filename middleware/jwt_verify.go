@@ -6,15 +6,43 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 // BearerClaims data structure for claims
 type BearerClaims struct {
 	DeviceID       string `json:"deviceId"`
 	UserAuthorized bool   `json:"authorised,bool"`
+	jwt.StandardClaims
+}
+
+// {
+// 	"reffId": "",
+// 	"tokenType": "shortToken",
+// 	"userType": "patient",
+// 	"role": "",
+// 	"hospitalId": "MEDISTRA",
+// 	"tokenId": "583bbedbf34d4526832e13d020c2baac",
+// 	"sub": "e0d8348746314fe1aac2ea099a5d46f4",
+// 	"iss": "telemed",
+// 	"exp": 1658475970,
+// 	"iat": 1658474170
+//   }
+type TokenInfo struct {
+	TokenTypeCode string `json:"tokenTypeCode"` //
+	UserId        string `json:"userId"`
+	ReffId        string `json:"reffId"`
+	UserTypeCode  string `json:"userTypeCode"`
+	Role          string `json:"role"`
+	HospitalId    string `json:"hospitalId"`
+	TokenId       string `json:"tokenId"`
+}
+
+type jwtCustomClaims struct {
+	TokenInfo
 	jwt.StandardClaims
 }
 
@@ -79,4 +107,39 @@ func JWTVerify(rsaPublicKey *rsa.PublicKey, mustAuthorized bool) echo.Middleware
 			}
 		}
 	}
+}
+
+func CrateJwtToken(tokenInfo *TokenInfo) (string, error) {
+
+	// Set custom claims
+	expiredIn := 24
+	if tokenInfo.TokenTypeCode == "shortToken" {
+		expiredIn = 1
+	}
+	claims := &jwtCustomClaims{
+
+		TokenInfo{
+			TokenTypeCode: tokenInfo.TokenTypeCode,
+			UserId:        tokenInfo.UserId,
+			ReffId:        tokenInfo.ReffId,
+			UserTypeCode:  tokenInfo.UserTypeCode,
+			Role:          tokenInfo.Role,
+			HospitalId:    tokenInfo.HospitalId,
+			TokenId:       tokenInfo.TokenId,
+		},
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * time.Duration(expiredIn)).Unix(),
+		},
+	}
+
+	// Create token with claims
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte("secret"))
+	if err != nil {
+		return "", err
+	}
+
+	return t, nil
 }

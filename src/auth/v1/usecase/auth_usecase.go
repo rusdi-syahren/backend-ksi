@@ -8,4 +8,7 @@ import (
 // AuthUsecase interface
 type AuthUsecase interface {
 	SignUpByPhone(*dto.SignUpByPhoneRequest) shared.Output
+	// login Patient
+	LoginByPhonePassword(*dto.LoginByPhoneRequest) shared.Output
+	LoginByPhoneOtp(*dto.LoginByPhoneOtpRequest) shared.Output
 }
