@@ -1,7 +1,7 @@
 package external
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -43,39 +43,44 @@ func NewSmsAcs() (*SmsAcs, error) {
 }
 
 // SendSms function
-func (s *SmsAcs) SendSms(params string) shared.Output {
+func (s *SmsAcs) SendSms(params shared.AcsSmsRequest, isSimulation bool) shared.Output {
 
-	url := fmt.Sprintf("%s", s.acsBaseURL.String())
-	// v, _ := query.Values(params)
+	var body string
+	if isSimulation {
+		body = shared.CreateSmsXmlResponse(&params)
 
-	payload := strings.NewReader(params)
+	} else {
+		smsPayload := shared.CreateSmsXmlRequest(&params)
+		url := fmt.Sprintf("%s", s.acsBaseURL.String())
+		payload := strings.NewReader(smsPayload)
 
-	req, _ := http.NewRequest("POST", url, payload)
+		req, _ := http.NewRequest("POST", url, payload)
 
-	req.Header.Add("content-type", "application/xml")
+		req.Header.Add("content-type", "application/xml")
 
-	res, err := http.DefaultClient.Do(req)
+		res, err := http.DefaultClient.Do(req)
 
-	if err != nil {
-		return shared.Output{Error: err}
+		if err != nil {
+			return shared.Output{Error: err}
+		}
+
+		defer res.Body.Close()
+		rs, err := ioutil.ReadAll(res.Body)
+		if err != nil {
+			return shared.Output{Error: err}
+		}
+		body = string(rs)
 	}
 
-	defer res.Body.Close()
-	body, err := ioutil.ReadAll(res.Body)
+	var output AcsSmsResponse
 
-	if err != nil {
-		return shared.Output{Error: err}
-	}
+	xml.Unmarshal([]byte(body), &output)
 
-	var smsResponse AcsSmsResponse
+	var allResponse AcsSmsAllResponse
+	allResponse.Response = output
+	allResponse.ResponseStr = body
 
-	err = json.Unmarshal(body, &smsResponse)
+	// spew.Dump(allResponse)
 
-	if err != nil {
-		return shared.Output{Error: err}
-	}
-
-	fmt.Println(smsResponse)
-
-	return shared.Output{Result: smsResponse}
+	return shared.Output{Result: &allResponse}
 }

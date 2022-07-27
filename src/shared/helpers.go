@@ -366,6 +366,26 @@ func CreateSmsXmlRequest(params *AcsSmsRequest) string {
 	return response
 }
 
+func CreateSmsXmlResponse(params *AcsSmsRequest) string {
+	doc := etree.NewDocument()
+	doc.CreateProcInst("xml", `version="1.0" encoding="UTF-8"`)
+
+	smsbc := doc.CreateElement("smsbc")
+	response := smsbc.CreateElement("response")
+	response.CreateElement("datetime").SetText(params.SmsBc.Request.Datetime)
+	response.CreateElement("rrn").SetText(params.SmsBc.Request.Rrn)
+	response.CreateElement("partnerId").SetText(params.SmsBc.Request.PartnerId)
+	response.CreateElement("partnerName").SetText(params.SmsBc.Request.PartnerName)
+	response.CreateElement("destinationNumber").SetText(params.SmsBc.Request.DestinationNumber)
+	response.CreateElement("message").SetText(params.SmsBc.Request.Message)
+	response.CreateElement("rc").SetText("1")
+	response.CreateElement("rm").SetText("success")
+	doc.Indent(2)
+
+	res, _ := doc.WriteToString()
+	return res
+}
+
 type AcsSmsRequest struct {
 	SmsBc AcsSmsReq `json:"smsbc" xml:"smsbc"`
 }

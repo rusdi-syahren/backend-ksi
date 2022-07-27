@@ -71,37 +71,41 @@ func (h *EchoHandler) AddAuth(c echo.Context) error {
 
 func (h *EchoHandler) LoginByPhonePassword(c echo.Context) error {
 	//initialize json schema template pointer
-	response := new(shared.JSONSchemaTemplate)
+	response := new(shared.JSONResponse)
 
 	params := new(dto.LoginByPhoneRequest)
 
 	err := c.Bind(params)
 
 	if err != nil {
-		response.Success = false
+		response.Error = err.Error()
 		response.Message = "Login by Phone is failed"
-		response.Code = http.StatusBadRequest
-		response.SetData(shared.Empty{})
+		response.Status = http.StatusBadRequest
+		response.SetPayload(shared.Empty{})
 
 		return response.ShowHTTPResponse(c)
 	}
 
-	SignUp := h.AuthUsecase.LoginByPhonePassword(params)
+	signIn := h.AuthUsecase.LoginByPhonePassword(params)
 
-	if SignUp.Error != nil {
-		response.Success = false
-		response.Message = SignUp.Error.Error()
-		response.Code = http.StatusBadRequest
+	if signIn.Error != nil {
+		errorResponse := signIn.Errors.(shared.ErrorResponse)
+		var errorList []shared.ErrorResponse
+		errorList = append(errorList, errorResponse)
+		response.Error = signIn.Error.Error()
+		response.Message = ""
+		response.Status = signIn.Code
+		response.Errors = errorList
+		response.SetPayload(signIn.Result)
 
 		return response.ShowHTTPResponse(c)
 	}
 
-	Auth := SignUp.Result.(dto.PatientLoginPasswordResp)
+	Auth := signIn.Result.(dto.PatientLoginPasswordResp)
 
-	response.Success = true
-	response.Message = "Login By Phone"
-	response.Code = http.StatusOK
-	response.SetData(Auth)
+	response.Status = http.StatusOK
+
+	response.SetPayload(Auth)
 
 	return response.ShowHTTPResponse(c)
 }

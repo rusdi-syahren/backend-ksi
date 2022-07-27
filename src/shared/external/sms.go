@@ -6,5 +6,5 @@ import (
 
 // Notif interface
 type Sms interface {
-	SendSms(WhatsappPayload) shared.Output
+	SendSms(shared.AcsSmsRequest, bool) shared.Output
 }
