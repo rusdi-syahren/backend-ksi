@@ -132,7 +132,7 @@ func SendEmailSMTP(to []string, data interface{}, template string) (bool, error)
 	mime := "MIME-version: 1.0;\nContent-Type: text/plain; charset=\"UTF-8\";\n\n"
 	subject := "Subject: " + "Test Email" + "!\n"
 	msg := []byte(subject + mime + "\n" + emailBody)
-	addr := fmt.Sprintf("%s:%s", emailHost, emailPort)
+	addr := fmt.Sprintf("%s:%v", emailHost, emailPort)
 
 	if err := smtp.SendMail(addr, emailAuth, emailFrom, to, msg); err != nil {
 		return false, err
