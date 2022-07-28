@@ -86,7 +86,6 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 			Error:  authenticateUser,
 			Errors: errResponse,
 			Code:   http.StatusUnauthorized}
-
 	}
 
 	// get otp by sec patient id
@@ -101,20 +100,27 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 			Error:  loadActiveSecPatient.Error,
 			Errors: errResponse,
 			Code:   http.StatusUnauthorized}
-
 	}
 
 	secPatientSignInOtp := loadActiveSecPatient.Result.(domain.SecPatientSignInOtp)
-	expiredOtp := secPatientSignInOtp.ExpiredDatetime
+	expiredOtp := secPatientSignInOtp.ExpiredDatetime.Local().Add(-time.Hour * 7)
 
-	// check otp expired ?
-	if expiredOtp.Before(time.Now().UTC()) {
+	if expiredOtp.Before(time.Now().Local()) {
 		secPatientSignInOtp.SecPatientSignInOtpID = ""
 	}
 
 	// validateSmsRate
+	return u.validateSignInSms(params, secPatientSignInOtp, getExistUser)
+
+}
+
+func (u *AuthUsecaseImpl) validateSignInSms(
+	params *dto.LoginByPhoneRequest,
+	secPatientSignInOtp domain.SecPatientSignInOtp,
+	getExistUser domain.SecUsers) shared.OutputV1 {
 	var smsRateData dto.SmsRateData
 	var patientLoginPasswordResp dto.PatientLoginPasswordResp
+
 	countSms := u.AuthRepositoryWrite.CountSms(params.MobilePhone)
 	smsRateData.SmsCount = countSms
 
@@ -136,17 +142,15 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 	strintervalBetweenSmsSecond, _ := os.LookupEnv("INTERVALBETWEENSMSSECOND")
 	fmt.Sscan(strintervalBetweenSmsSecond, &intervalBetweenSmsSecond)
 
-	localDateTimeNow := time.Now().UTC()
+	localDateTimeNow := time.Now().Local()
 	var allowSendSms bool
 	var errorMessage string
 	var allowSendLocalDateTime time.Time
 	localDateTimeValidation := localDateTimeNow.Add(time.Second * time.Duration(intervalValidationCorrectionSecond))
 
 	getSmsLog := u.AuthRepositoryWrite.GetSmsLog(params.MobilePhone)
-
 	lastSms := getSmsLog.Result.(domain.SmsLog)
-
-	lastSmsDatetime := lastSms.CreatedOn.UTC()
+	lastSmsDatetime := lastSms.CreatedOn.Local().Add(-time.Hour * 7)
 
 	if countSms >= maxGroupSmsCount {
 		allowSendLocalDateTime = lastSmsDatetime.Add(time.Second * time.Duration(intervalGroupSecond))
@@ -160,23 +164,20 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 		} else {
 			allowSendLocalDateTime = lastSmsDatetime.Add(time.Second * time.Duration(intervalBetweenSmsSecond))
 			allowSendSms = !allowSendLocalDateTime.After(localDateTimeValidation)
+
 		}
 	}
 
 	if allowSendSms {
 		errorMessage = ""
-
 	} else {
 		errorMessage = fmt.Sprintf(external.SmsValidationLimitGroup, params.MobilePhone, allowSendLocalDateTime.Format(external.DateFormatStr))
 	}
 
 	allowSendInSecond := 0
-
 	if allowSendLocalDateTime.After(localDateTimeNow) {
 		getAllowSendInSecond := allowSendLocalDateTime.Sub(localDateTimeNow)
 		allowSendInSecond = int(getAllowSendInSecond.Seconds())
-	} else {
-		allowSendInSecond = 0
 	}
 
 	smsRateData.MobilePhone = params.MobilePhone
@@ -190,16 +191,15 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 	smsRateData.AllowSendLocalDateTime = allowSendLocalDateTime.Format(external.DateFormat)
 
 	var dataOptSignIn domain.SecPatientSignInOtp
-	expiredDatetime := time.Now().UTC().Add(time.Second * time.Duration(signInPatientLiveTimeSecond))
+	expiredDatetime := time.Now().Local().Add(time.Second * time.Duration(signInPatientLiveTimeSecond))
+
 	if allowSendSms {
 		// check jarak sms
-
-		if lastSmsDatetime.Before(time.Now().UTC().Add(-time.Second * time.Duration(durationSameNumberSecond))) {
-
-			otpSignIn := shared.RandomString(4)
-
+		if lastSmsDatetime.Before(time.Now().Local().Add(-time.Second * time.Duration(durationSameNumberSecond))) {
+			otpSignIn := ""
 			secPatientSignInOtpID := secPatientSignInOtp.SecPatientSignInOtpID
 			if secPatientSignInOtp.SecPatientSignInOtpID == "" {
+				otpSignIn = shared.RandomString(4)
 				strsignInPatientLiveTimeSecond, _ := os.LookupEnv("SIGNINPATIENTLIVETIMESECOND")
 				fmt.Sscan(strsignInPatientLiveTimeSecond, &signInPatientLiveTimeSecond)
 				dataOptSignIn.SecPatientSignInOtpID = shared.GenerateUUID()
@@ -210,10 +210,11 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 				dataOptSignIn.Otp = otpSignIn
 				dataOptSignIn.ExpiredDatetime = expiredDatetime
 				dataOptSignIn.RetryCounter = 0
+				dataOptSignIn.IsActive = true
 				dataOptSignIn.CreatedBy = getExistUser.SecUserId
 				dataOptSignIn.UpdatedBy = getExistUser.SecUserId
-				dataOptSignIn.CreatedOn = time.Now().UTC()
-				dataOptSignIn.UpdatedOn = time.Now().UTC()
+				dataOptSignIn.CreatedOn = time.Now().Local()
+				dataOptSignIn.UpdatedOn = time.Now().Local()
 				savePatientOtp := u.AuthRepositoryWrite.SavePatientOtpSignIn(&dataOptSignIn)
 				if savePatientOtp.Error != nil {
 					errResponse := shared.ErrorResponse{
@@ -238,6 +239,7 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 					return shared.OutputV1{Error: updatePatientOtp.Error, Result: errResponse, Code: http.StatusBadRequest}
 
 				}
+				otpSignIn = secPatientSignInOtp.Otp
 			}
 
 			// saveSmsLog
@@ -251,8 +253,8 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 			dataSmsLog.SmsContent = fmt.Sprintf(external.SmsOtpSignIn, otpSignIn)
 			dataSmsLog.CreatedBy = getExistUser.SecUserId
 			dataSmsLog.UpdatedBy = getExistUser.SecUserId
-			dataSmsLog.CreatedOn = time.Now().UTC()
-			dataSmsLog.UpdatedOn = time.Now().UTC()
+			dataSmsLog.CreatedOn = time.Now().Local()
+			dataSmsLog.UpdatedOn = time.Now().Local()
 			savesmslogs := u.AuthRepositoryWrite.SaveSmsLogs(&dataSmsLog)
 			if savesmslogs.Error != nil {
 				errResponse := shared.ErrorResponse{
@@ -272,14 +274,39 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 			strAcsPassword, _ := os.LookupEnv("ACS_PASSWORD")
 			strsmsSiluation, _ := os.LookupEnv("SMS_SIMULATION")
 			fmt.Sscan(strsmsSiluation, &smsSimulation)
-			smsReq.SmsBc.Request.Datetime = time.Now().UTC().Format(external.SmsDateFormat)
+
+			smsReq.SmsBc.Request.Datetime = time.Now().Local().Format(external.SmsDateFormat)
 			smsReq.SmsBc.Request.DestinationNumber = params.MobilePhone
 			smsReq.SmsBc.Request.Rrn = shared.GenerateUUID()
 			smsReq.SmsBc.Request.PartnerId = strAcsPartnerID
 			smsReq.SmsBc.Request.PartnerName = strAcsPartnerName
 			smsReq.SmsBc.Request.Password = strAcsPassword
 			smsReq.SmsBc.Request.Message = fmt.Sprintf(external.SmsOtpSignIn, otpSignIn)
+
+			// saveSmsLog request
+			var dataSmsLogMessage domain.SmsLogMessage
+			dataSmsLogMessage.SmsLogMessageID = shared.GenerateUUID()
+			dataSmsLogMessage.SmsLogID = dataSmsLog.SmsLogID
+			dataSmsLogMessage.MessageRrn = smsReq.SmsBc.Request.Rrn
+			dataSmsLogMessage.ReqResTypeCode = "req"
+			dataSmsLogMessage.XmlMessage = shared.CreateSmsXmlRequest(&smsReq)
+			dataSmsLogMessage.CreatedBy = "APP-SMS"
+			dataSmsLogMessage.UpdatedBy = "APP-SMS"
+			dataSmsLogMessage.CreatedOn = time.Now().Local()
+			dataSmsLogMessage.UpdatedOn = time.Now().Local()
+			saveSmsLogMessReq := u.AuthRepositoryWrite.SaveSmsLogMessages(&dataSmsLogMessage)
+			if saveSmsLogMessReq.Error != nil {
+				errResponse := shared.ErrorResponse{
+					Field:   "",
+					Code:    "SECURITY_USERPWD_INVALID",
+					Message: saveSmsLogMessReq.Error.Error(),
+				}
+				return shared.OutputV1{Error: saveSmsLogMessReq.Error, Errors: errResponse, Code: http.StatusBadRequest}
+
+			}
+
 			responeSms := u.External.SendSms(smsReq, smsSimulation)
+			getResponseSms := responeSms.Result.(*external.AcsSmsAllResponse)
 			if responeSms.Error != nil {
 				errResponse := shared.ErrorResponse{
 					Field:   "",
@@ -290,11 +317,27 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 
 			}
 
+			// saveSmsLogMessageRes
+			dataSmsLogMessage.SmsLogMessageID = shared.GenerateUUID()
+			dataSmsLogMessage.ReqResTypeCode = "resp"
+			dataSmsLogMessage.ResponseCode = getResponseSms.Response.Response.Rc
+			dataSmsLogMessage.ResponseMessage = getResponseSms.Response.Response.Rm
+			dataSmsLogMessage.XmlMessage = shared.CreateSmsXmlResponse(&smsReq)
+			saveSmsLogMessRes := u.AuthRepositoryWrite.SaveSmsLogMessages(&dataSmsLogMessage)
+			if saveSmsLogMessRes.Error != nil {
+				errResponse := shared.ErrorResponse{
+					Field:   "",
+					Code:    "SECURITY_USERPWD_INVALID",
+					Message: saveSmsLogMessRes.Error.Error(),
+				}
+				return shared.OutputV1{Error: saveSmsLogMessRes.Error, Errors: errResponse, Code: http.StatusBadRequest}
+
+			}
+
 		} else {
 
 			allowAfter20Sec := lastSmsDatetime.Add(time.Second * time.Duration(intervalBetweenSmsSecond))
-
-			insecLeft := allowAfter20Sec.Sub(time.Now().UTC())
+			insecLeft := allowAfter20Sec.Sub(time.Now().Local())
 			leftSecondOf60 := int(insecLeft.Seconds())
 			smsRateData.AllowSendInSecond = leftSecondOf60
 			smsRateData.AllowSendSms = false
@@ -332,7 +375,6 @@ func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) 
 	}
 
 	return shared.OutputV1{Result: patientLoginPasswordResp}
-
 }
 
 // SignUpByPhone function

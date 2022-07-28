@@ -18,5 +18,6 @@ type AuthRepository interface {
 	GetSmsLog(string) shared.Output
 	SavePatientOtpSignIn(*domain.SecPatientSignInOtp) shared.Output
 	SaveSmsLogs(*domain.SmsLog) shared.Output
+	SaveSmsLogMessages(*domain.SmsLogMessage) shared.Output
 	UpdatePatientOtpSignIn(*domain.SecPatientSignInOtp) shared.Output
 }

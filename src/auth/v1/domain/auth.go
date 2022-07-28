@@ -1,6 +1,8 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 // SignUpByPhone struct
 type SignUpByPhone struct {
@@ -87,4 +89,24 @@ type SmsLog struct {
 // TableName function
 func (sl SmsLog) TableName() string {
 	return "sms.sms_logs"
+}
+
+// SmsLogMessage struct
+type SmsLogMessage struct {
+	SmsLogMessageID string    `gorm:"column:sms_log_message_id" json:"smsLogMessageID"`
+	SmsLogID        string    `gorm:"column:sms_log_id"  json:"smsLogId"`
+	MessageRrn      string    `gorm:"column:message_rrn" json:"messageRrn"`
+	ReqResTypeCode  string    `gorm:"column:req_res_type_code" json:"reqResTypeCode"`
+	ResponseCode    string    `gorm:"column:response_code" json:"responseCode"`
+	ResponseMessage string    `gorm:"column:response_message" json:"responseMessage"`
+	XmlMessage      string    `gorm:"column:xml_message" json:"xmlMessage"`
+	CreatedBy       string    `gorm:"column:created_by" json:"createdBy"`
+	CreatedOn       time.Time `gorm:"column:created_on" json:"createdOn"`
+	UpdatedBy       string    `gorm:"column:updated_by" json:"updatedBy" `
+	UpdatedOn       time.Time `gorm:"column:updated_on" json:"updatedOn" `
+}
+
+// TableName function
+func (slm SmsLogMessage) TableName() string {
+	return "sms.sms_log_messages"
 }

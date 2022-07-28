@@ -378,8 +378,8 @@ func CreateSmsXmlResponse(params *AcsSmsRequest) string {
 	response.CreateElement("partnerName").SetText(params.SmsBc.Request.PartnerName)
 	response.CreateElement("destinationNumber").SetText(params.SmsBc.Request.DestinationNumber)
 	response.CreateElement("message").SetText(params.SmsBc.Request.Message)
-	response.CreateElement("rc").SetText("1")
-	response.CreateElement("rm").SetText("success")
+	response.CreateElement("rc").SetText("XX")
+	response.CreateElement("rm").SetText("Sukses Simulation")
 	doc.Indent(2)
 
 	res, _ := doc.WriteToString()

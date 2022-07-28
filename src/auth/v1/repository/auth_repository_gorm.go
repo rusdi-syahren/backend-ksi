@@ -111,6 +111,7 @@ func (r *AuthRepositoryGorm) LoadActiveSecPatient(secUserId string) shared.Outpu
 	if err != nil {
 		return shared.Output{Error: err}
 	}
+	// spew.Dump(secUserSignOtp)
 
 	return shared.Output{Result: secUserSignOtp}
 }
@@ -121,7 +122,7 @@ func (r *AuthRepositoryGorm) CountSms(mobilePhone string) int {
 		Total uint
 	}{}
 	r.db.Raw(`SELECT count(*) total FROM sms.sms_logs
-	where mobile_phone = ? and  created_on > ?`, mobilePhone, time.Now().UTC().Add(-time.Second*1200)).Scan(&results)
+	where mobile_phone = ? and  created_on > ?`, mobilePhone, time.Now().Local().Add(-time.Second*1200)).Scan(&results)
 
 	return int(results.Total)
 }
@@ -151,7 +152,7 @@ func (r *AuthRepositoryGorm) UpdatePatientOtpSignIn(params *domain.SecPatientSig
 	var response domain.SecPatientSignInOtp
 
 	var dbArgsCustomer []interface{}
-	sqlCustomer := "update security.sec_patient_sign_in_otps set retry_counter += 1 ,  created_on = ?"
+	sqlCustomer := "update security.sec_patient_sign_in_otps set retry_counter = retry_counter + 1 , created_on = ?"
 
 	dbArgsCustomer = append(dbArgsCustomer, time.Now().UTC())
 
@@ -164,6 +165,16 @@ func (r *AuthRepositoryGorm) UpdatePatientOtpSignIn(params *domain.SecPatientSig
 }
 
 func (r *AuthRepositoryGorm) SaveSmsLogs(params *domain.SmsLog) shared.Output {
+
+	err := r.db.Save(params).Error
+	if err != nil {
+		return shared.Output{Error: err, Result: params}
+	}
+
+	return shared.Output{Result: params}
+}
+
+func (r *AuthRepositoryGorm) SaveSmsLogMessages(params *domain.SmsLogMessage) shared.Output {
 
 	err := r.db.Save(params).Error
 	if err != nil {
