@@ -8,7 +8,7 @@ import (
 
 // AuthRepository interface
 type AuthRepository interface {
-	SignUpByPhone(*dto.SignUpByPhoneRequest) shared.Output
+	// login patient
 	LoginByPhone(*dto.LoginByPhoneRequest) shared.Output
 	LoginByPhoneOtp(*dto.LoginByPhoneOtpRequest) shared.Output
 	CheckUserDelete(*dto.LoginByPhoneRequest) bool

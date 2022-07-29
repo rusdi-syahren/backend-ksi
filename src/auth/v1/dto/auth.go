@@ -1,12 +1,6 @@
 package dto
 
-// SignUpByPhoneRequest struct
-type SignUpByPhoneRequest struct {
-	MobilePhone string `json:"mobilePhone"`
-	Password    string `json:"pasword"`
-	RePassword  string `json:"rePassword"`
-	UserType    string `json:"userType"`
-}
+import "time"
 
 type LoginByPhoneRequest struct {
 	DeviceType  string `json:"deviceType"`
@@ -49,20 +43,41 @@ type LoginByPhoneOtpResponse struct {
 	DeviceCode         string       `json:"deviceCode"`
 	UserType           string       `json:"userType"`
 	Role               string       `json:"role"`
-	Features           string       `json:"features"` // []
-	Menus              string       `json:"menus"`    // []
+	Features           Features     `json:"features"` // []
+	Menus              Menus        `json:"menus"`    // []
 	TimeZoneId         string       `json:"timeZoneId"`
 }
 
 type Token struct {
-	Token      string `json:"token"`
-	Expiration string `json:"expiration"`
+	Token      string    `json:"token"`
+	Expiration time.Time `json:"expiration"`
 }
+
 type JwtTokenData struct {
 	LongToken  Token `json:"longToken"`
 	ShortToken Token `json:"shortToken"`
 }
 
+type Features struct {
+	SecFeatureId string `json:"secFeatureId"`
+	FeatureCode  string `json:"featureCode"`
+	FeatureName  string `json:"featureName"`
+	Create       bool   `json:"create"`
+	Read         bool   `json:"read"`
+	Update       bool   `json:"update"`
+	Delete       bool   `json:"delete"`
+}
+
+type Menus struct {
+	SecMenuId       string `json:"secMenuId"`
+	MenuCode        string `json:"menuCode"`
+	MenuName        string `json:"menuName"`
+	MenuDescription string `json:"menuDescription"`
+	Create          bool   `json:"create"`
+	Read            bool   `json:"read"`
+	Update          bool   `json:"update"`
+	Delete          bool   `json:"delete"`
+}
 type SmsRateData struct {
 	MobilePhone              string `json:"mobilePhone"`
 	AllowSendSms             bool   `json:"allowSendSms"`

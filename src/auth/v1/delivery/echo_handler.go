@@ -25,51 +25,12 @@ func NewEchoHandler(AuthUsecase usecase.AuthUsecase) *EchoHandler {
 // Mount function
 // Params : *echo.Group
 func (h *EchoHandler) Mount(group *echo.Group) {
-	group.POST("/sign-up/by-mobile-phone", h.AddAuth)
-	group.POST("/login/patient/mobile-phone-password", h.LoginByPhonePassword)
-	group.POST("/login/patient/mobile-phone-otp", h.LoginByPhoneOtp)
+	group.POST("/login/patient/mobile-phone-password", h.SignInByPhonePassword)
+	group.POST("/login/patient/mobile-phone-otp", h.SignInByPhoneOtp)
 
 }
 
-// SignUp by Phone
-func (h *EchoHandler) AddAuth(c echo.Context) error {
-	//initialize json schema template pointer
-	response := new(shared.JSONSchemaTemplate)
-
-	params := new(dto.SignUpByPhoneRequest)
-
-	err := c.Bind(params)
-
-	if err != nil {
-		response.Success = false
-		response.Message = "SignUp by Phone is failed"
-		response.Code = http.StatusBadRequest
-		response.SetData(shared.Empty{})
-
-		return response.ShowHTTPResponse(c)
-	}
-
-	SignUp := h.AuthUsecase.SignUpByPhone(params)
-
-	if SignUp.Error != nil {
-		response.Success = false
-		response.Message = SignUp.Error.Error()
-		response.Code = http.StatusBadRequest
-
-		return response.ShowHTTPResponse(c)
-	}
-
-	Auth := SignUp.Result.(domain.SignUpByPhone)
-
-	response.Success = true
-	response.Message = "SignUp By Phone"
-	response.Code = http.StatusOK
-	response.SetData(Auth)
-
-	return response.ShowHTTPResponse(c)
-}
-
-func (h *EchoHandler) LoginByPhonePassword(c echo.Context) error {
+func (h *EchoHandler) SignInByPhonePassword(c echo.Context) error {
 	//initialize json schema template pointer
 	response := new(shared.JSONResponse)
 
@@ -79,14 +40,14 @@ func (h *EchoHandler) LoginByPhonePassword(c echo.Context) error {
 
 	if err != nil {
 		response.Error = err.Error()
-		response.Message = "Login by Phone is failed"
+		response.Message = "SignIn by Phone is failed"
 		response.Status = http.StatusBadRequest
 		response.SetPayload(shared.Empty{})
 
 		return response.ShowHTTPResponse(c)
 	}
 
-	signIn := h.AuthUsecase.LoginByPhonePassword(params)
+	signIn := h.AuthUsecase.SignInByPhonePassword(params)
 
 	if signIn.Error != nil {
 		errorResponse := signIn.Errors.(shared.ErrorResponse)
@@ -110,7 +71,7 @@ func (h *EchoHandler) LoginByPhonePassword(c echo.Context) error {
 	return response.ShowHTTPResponse(c)
 }
 
-func (h *EchoHandler) LoginByPhoneOtp(c echo.Context) error {
+func (h *EchoHandler) SignInByPhoneOtp(c echo.Context) error {
 	//initialize json schema template pointer
 	response := new(shared.JSONSchemaTemplate)
 
@@ -120,14 +81,14 @@ func (h *EchoHandler) LoginByPhoneOtp(c echo.Context) error {
 
 	if err != nil {
 		response.Success = false
-		response.Message = "Login by otp is failed"
+		response.Message = "SignIn by otp is failed"
 		response.Code = http.StatusBadRequest
 		response.SetData(shared.Empty{})
 
 		return response.ShowHTTPResponse(c)
 	}
 
-	SignUp := h.AuthUsecase.LoginByPhoneOtp(params)
+	SignUp := h.AuthUsecase.SignInByPhoneOtp(params)
 
 	if SignUp.Error != nil {
 		response.Success = false
@@ -140,7 +101,7 @@ func (h *EchoHandler) LoginByPhoneOtp(c echo.Context) error {
 	Auth := SignUp.Result.(domain.SignUpByPhone)
 
 	response.Success = true
-	response.Message = "Login By Phone"
+	response.Message = "SignIn By Phone"
 	response.Code = http.StatusOK
 	response.SetData(Auth)
 

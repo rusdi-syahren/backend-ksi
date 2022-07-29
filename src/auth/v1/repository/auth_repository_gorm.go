@@ -21,19 +21,6 @@ func NewAuthRepositoryGorm(db *gorm.DB) *AuthRepositoryGorm {
 }
 
 // SignUpByPhone function
-func (r *AuthRepositoryGorm) SignUpByPhone(params *dto.SignUpByPhoneRequest) shared.Output {
-
-	var signUp domain.SignUpByPhone
-
-	err := r.db.Save(&signUp).Error
-	if err != nil {
-		return shared.Output{Error: err, Result: signUp}
-	}
-
-	return shared.Output{Result: signUp}
-}
-
-// SignUpByPhone function
 func (r *AuthRepositoryGorm) LoginByPhone(params *dto.LoginByPhoneRequest) shared.Output {
 
 	var Login domain.SignUpByPhone

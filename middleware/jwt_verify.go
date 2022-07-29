@@ -19,18 +19,6 @@ type BearerClaims struct {
 	jwt.StandardClaims
 }
 
-// {
-// 	"reffId": "",
-// 	"tokenType": "shortToken",
-// 	"userType": "patient",
-// 	"role": "",
-// 	"hospitalId": "MEDISTRA",
-// 	"tokenId": "583bbedbf34d4526832e13d020c2baac",
-// 	"sub": "e0d8348746314fe1aac2ea099a5d46f4",
-// 	"iss": "telemed",
-// 	"exp": 1658475970,
-// 	"iat": 1658474170
-//   }
 type TokenInfo struct {
 	TokenTypeCode string `json:"tokenTypeCode"` //
 	UserId        string `json:"userId"`

@@ -29,21 +29,7 @@ func NewAuthUsecaseImpl(AuthRepositoryWrite repository.AuthRepository, External 
 }
 
 // SignUpByPhone function
-func (u *AuthUsecaseImpl) SignUpByPhone(filter *dto.SignUpByPhoneRequest) shared.Output {
-
-	// assign Auth process
-	signUp := u.AuthRepositoryWrite.SignUpByPhone(filter)
-	if signUp.Error != nil {
-		return shared.Output{Error: signUp.Error}
-	}
-
-	response := signUp.Result.(domain.SignUpByPhone)
-
-	return shared.Output{Result: response}
-}
-
-// SignUpByPhone function
-func (u *AuthUsecaseImpl) LoginByPhonePassword(params *dto.LoginByPhoneRequest) shared.OutputV1 {
+func (u *AuthUsecaseImpl) SignInByPhonePassword(params *dto.LoginByPhoneRequest) shared.OutputV1 {
 
 	// check deleted user
 	checkUserDel := u.AuthRepositoryWrite.CheckUserDelete(params)
@@ -191,7 +177,9 @@ func (u *AuthUsecaseImpl) validateSignInSms(
 	smsRateData.AllowSendLocalDateTime = allowSendLocalDateTime.Format(external.DateFormat)
 
 	var dataOptSignIn domain.SecPatientSignInOtp
-	expiredDatetime := time.Now().Local().Add(time.Second * time.Duration(signInPatientLiveTimeSecond))
+	strsignInPatientLiveTimeSecond, _ := os.LookupEnv("SIGNINPATIENTLIVETIMESECOND")
+	fmt.Sscan(strsignInPatientLiveTimeSecond, &signInPatientLiveTimeSecond)
+	expiredDatetime := time.Now().Add(time.Second * time.Duration(signInPatientLiveTimeSecond)).Local()
 
 	if allowSendSms {
 		// check jarak sms
@@ -200,8 +188,6 @@ func (u *AuthUsecaseImpl) validateSignInSms(
 			secPatientSignInOtpID := secPatientSignInOtp.SecPatientSignInOtpID
 			if secPatientSignInOtp.SecPatientSignInOtpID == "" {
 				otpSignIn = shared.RandomString(4)
-				strsignInPatientLiveTimeSecond, _ := os.LookupEnv("SIGNINPATIENTLIVETIMESECOND")
-				fmt.Sscan(strsignInPatientLiveTimeSecond, &signInPatientLiveTimeSecond)
 				dataOptSignIn.SecPatientSignInOtpID = shared.GenerateUUID()
 				dataOptSignIn.SecUserID = getExistUser.SecUserId
 				dataOptSignIn.MobilePhone = params.MobilePhone
@@ -378,7 +364,7 @@ func (u *AuthUsecaseImpl) validateSignInSms(
 }
 
 // SignUpByPhone function
-func (u *AuthUsecaseImpl) LoginByPhoneOtp(params *dto.LoginByPhoneOtpRequest) shared.Output {
+func (u *AuthUsecaseImpl) SignInByPhoneOtp(params *dto.LoginByPhoneOtpRequest) shared.Output {
 
 	signUp := u.AuthRepositoryWrite.LoginByPhoneOtp(params)
 	if signUp.Error != nil {
