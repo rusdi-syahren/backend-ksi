@@ -20,6 +20,7 @@ func (sbp SignUpByPhone) TableName() string {
 // SecUsers struct
 type SecUsers struct {
 	SecUserId                string `json:"secUserId" schema:"sec_user_id"`
+	ReffId                   string `json:"reffId" schema:"reff_id"`
 	HptHospitalID            string `json:"hptHospitalId" schema:"hpt_hospital_id"`
 	Email                    string `json:"email" schema:"email"`
 	EmailVerifStatus         bool   `json:"emailVerifStatus" schema:"email_verif_status"`
@@ -27,7 +28,7 @@ type SecUsers struct {
 	MobilePhoneVerifStatus   bool   `json:"mobilePhoneVerifStatus" schema:"mobile_phone_verif_status"`
 	UserTypeCode             string `json:"userTypeCode" schema:"user_type_code"`
 	Password                 string `json:"password" schema:"password"`
-	Fullname                 string `json:"full_name" schema:"full_name"`
+	FullName                 string `json:"fullName" schema:"full_name"`
 	GenderCode               string `json:"genderCode" schema:"gender_code"`
 	LastSuccessLoginDatetime string `json:"lastSuccessLoginDatetime" schema:"last_success_login_datetime"`
 	LoginFailCount           int    `json:"loginFailCount" schema:"login_fail_count"`

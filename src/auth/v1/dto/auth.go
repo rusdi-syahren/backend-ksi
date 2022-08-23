@@ -43,8 +43,8 @@ type LoginByPhoneOtpResponse struct {
 	DeviceCode         string       `json:"deviceCode"`
 	UserType           string       `json:"userType"`
 	Role               string       `json:"role"`
-	Features           Features     `json:"features"` // []
-	Menus              Menus        `json:"menus"`    // []
+	Features           []Features   `json:"features"` // []
+	Menus              []Menus      `json:"menus"`    // []
 	TimeZoneId         string       `json:"timeZoneId"`
 }
 
@@ -78,6 +78,7 @@ type Menus struct {
 	Update          bool   `json:"update"`
 	Delete          bool   `json:"delete"`
 }
+
 type SmsRateData struct {
 	MobilePhone              string `json:"mobilePhone"`
 	AllowSendSms             bool   `json:"allowSendSms"`

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo/v4"
 )
@@ -97,10 +98,8 @@ func JWTVerify(rsaPublicKey *rsa.PublicKey, mustAuthorized bool) echo.Middleware
 	}
 }
 
-func CrateJwtToken(tokenInfo *TokenInfo) (string, error) {
-
+func CrateJwtToken(tokenInfo *TokenInfo, expiredIn int) (string, error) {
 	// Set custom claims
-	expiredIn := 24
 	if tokenInfo.TokenTypeCode == "shortToken" {
 		expiredIn = 1
 	}
@@ -121,10 +120,11 @@ func CrateJwtToken(tokenInfo *TokenInfo) (string, error) {
 	}
 
 	// Create token with claims
-	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Generate encoded token and send it as response.
-	t, err := token.SignedString([]byte("secret"))
+	t, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	spew.Dump(t)
 	if err != nil {
 		return "", err
 	}

@@ -89,6 +89,24 @@ func (r *AuthRepositoryGorm) CheckUserExist(params *dto.LoginByPhoneRequest) sha
 	return shared.Output{Result: secUser}
 }
 
+//GetSecUserByID
+func (r *AuthRepositoryGorm) GetSecUserByID(secuserID string) shared.Output {
+
+	var secUser domain.SecUsers
+
+	err := r.db.Raw(`SELECT  * FROM security.sec_users
+	where sec_user_id = ? `, secuserID).Scan(&secUser).Error
+	if err != nil {
+		return shared.Output{Error: err}
+	}
+
+	if secUser.SecUserId == "" {
+		return shared.Output{Error: errors.New("data not found")}
+	}
+
+	return shared.Output{Result: secUser}
+}
+
 func (r *AuthRepositoryGorm) LoadActiveSecPatient(secUserId string) shared.Output {
 
 	var secUserSignOtp domain.SecPatientSignInOtp
@@ -169,4 +187,14 @@ func (r *AuthRepositoryGorm) SaveSmsLogMessages(params *domain.SmsLogMessage) sh
 	}
 
 	return shared.Output{Result: params}
+}
+
+func (r *AuthRepositoryGorm) FindBySecPatientSignInOtp(params *dto.LoginByPhoneOtpRequest) shared.Output {
+
+	var secPatientSignInOtp domain.SecPatientSignInOtp
+
+	r.db.Raw(`SELECT * FROM security.sec_patient_sign_in_otps
+	where sec_patient_sign_in_otp_id = ? and is_active = true and is_deleted = false `, params.SecPatientSignInOtpId).Scan(&secPatientSignInOtp)
+
+	return shared.Output{Result: secPatientSignInOtp}
 }

@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/Klinisia/backend-ksi/middleware"
 	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
 	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
 	"github.com/Klinisia/backend-ksi/src/auth/v1/repository"
@@ -364,14 +365,99 @@ func (u *AuthUsecaseImpl) validateSignInSms(
 }
 
 // SignUpByPhone function
-func (u *AuthUsecaseImpl) SignInByPhoneOtp(params *dto.LoginByPhoneOtpRequest) shared.Output {
+func (u *AuthUsecaseImpl) SignInByPhoneOtp(params *dto.LoginByPhoneOtpRequest) shared.OutputV1 {
 
-	signUp := u.AuthRepositoryWrite.LoginByPhoneOtp(params)
-	if signUp.Error != nil {
-		return shared.Output{Error: signUp.Error}
+	// findBySecPatientSignInOtp
+	getSecPatientSignInOtp := u.AuthRepositoryWrite.FindBySecPatientSignInOtp(params)
+	if getSecPatientSignInOtp.Error != nil {
+		return shared.OutputV1{Error: getSecPatientSignInOtp.Error}
 	}
 
-	response := signUp.Result.(domain.SignUpByPhone)
+	secPatientSignInOtp := getSecPatientSignInOtp.Result.(domain.SecPatientSignInOtp)
 
-	return shared.Output{Result: response}
+	// validateOtp
+	u.ValidateOtp(params, &secPatientSignInOtp)
+
+	// getSecUser
+	getSecUser := u.AuthRepositoryWrite.GetSecUserByID(secPatientSignInOtp.SecUserID)
+	if getSecUser.Error != nil {
+		return shared.OutputV1{Error: getSecPatientSignInOtp.Error}
+	}
+	secUser := getSecUser.Result.(domain.SecUsers)
+
+	successResp := u.CreateSuccessLoginResp(&secPatientSignInOtp, &secUser)
+
+	// updateSecUser
+	// storeLongToken
+	// logLoginActivity
+	// deleteAllToken
+	// markSignInOtpAsUsed
+
+	return shared.OutputV1{Result: successResp}
+}
+
+func (u *AuthUsecaseImpl) ValidateOtp(loginOtpReq *dto.LoginByPhoneOtpRequest, secPatientSignInOtp *domain.SecPatientSignInOtp) shared.OutputV1 {
+
+	// check expired
+	expiredOtp := secPatientSignInOtp.ExpiredDatetime.Local().Add(-time.Hour * 7)
+
+	if expiredOtp.Before(time.Now().Local()) {
+
+		errResponse := shared.ErrorResponse{
+			Field:   "",
+			Code:    "SECURITY_USERPWD_INVALID",
+			Message: "Login gagal, OTP expired",
+		}
+		return shared.OutputV1{
+			Error:  errors.New("Login gagal, OTP expired"),
+			Errors: errResponse,
+			Code:   http.StatusUnauthorized}
+	}
+	// check if not equal
+	if secPatientSignInOtp.Otp != loginOtpReq.Otp {
+		errResponse := shared.ErrorResponse{
+			Field:   "",
+			Code:    "SECURITY_USERPWD_INVALID",
+			Message: "Login gagal, OTP tidak valid",
+		}
+		return shared.OutputV1{
+			Error:  errors.New("Login gagal, OTP tidak valid"),
+			Errors: errResponse,
+			Code:   http.StatusUnauthorized}
+	}
+
+	return shared.OutputV1{Result: secPatientSignInOtp}
+}
+
+func (u *AuthUsecaseImpl) CreateSuccessLoginResp(secPatientSignInOtp *domain.SecPatientSignInOtp, secUser *domain.SecUsers) dto.LoginByPhoneOtpResponse {
+	var response dto.LoginByPhoneOtpResponse
+
+	tokenID := shared.GenerateUUID()
+	response.SecUserId = secUser.SecUserId
+	response.TokenId = tokenID
+	response.FullName = secUser.FullName
+	response.MustChangePassword = secUser.MustChangePassword
+	response.DeviceType = secPatientSignInOtp.DeviceTypeCode
+	response.DeviceCode = secPatientSignInOtp.DeviceCode
+	response.UserType = "patient"
+
+	var jwtTokenData dto.JwtTokenData
+	var tokenInfo middleware.TokenInfo
+	tokenInfo.TokenTypeCode = "Short Token"
+	tokenInfo.UserId = secUser.SecUserId
+	tokenInfo.ReffId = secUser.ReffId
+	tokenInfo.UserTypeCode = secUser.UserTypeCode
+	tokenInfo.HospitalId = secUser.HptHospitalID
+	tokenInfo.TokenId = tokenID
+
+	shortToken, _ := middleware.CrateJwtToken(&tokenInfo, 1)
+	longToken, _ := middleware.CrateJwtToken(&tokenInfo, 24)
+
+	jwtTokenData.ShortToken = dto.Token{Token: shortToken, Expiration: time.Now().Local().Add(time.Hour * 1)}
+	jwtTokenData.LongToken = dto.Token{Token: longToken, Expiration: time.Now().Local().Add(time.Hour * 24)}
+
+	response.JwtToken = jwtTokenData
+
+	return response
+
 }
