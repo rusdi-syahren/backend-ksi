@@ -7,7 +7,9 @@ import (
 	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
 	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
 	"github.com/Klinisia/backend-ksi/src/shared"
-	"github.com/jinzhu/gorm"
+
+	// "github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // AuthRepositoryGorm struct
@@ -25,8 +27,7 @@ func (r *AuthRepositoryGorm) LoginByPhone(params *dto.LoginByPhoneRequest) share
 
 	var Login domain.SignUpByPhone
 
-	err := r.db.Raw(`SELECT * FROM user_management
-	where phone = ? `, params.MobilePhone).Scan(&Login).Error
+	err := r.db.Raw(`SELECT * FROM user_management where phone = ?`, params.MobilePhone).Scan(&Login).Error
 	if err != nil {
 		err = errors.New("data not found")
 		return shared.Output{Error: err}
@@ -41,7 +42,7 @@ func (r *AuthRepositoryGorm) LoginByPhoneOtp(params *dto.LoginByPhoneOtpRequest)
 	var Login domain.SignUpByPhone
 
 	err := r.db.Raw(`SELECT * FROM user_management
-	where secPatientSignInOtpId = ? `, params.SecPatientSignInOtpId).Scan(&Login).Error
+	where secPatientSignInOtpId = ?`, params.SecPatientSignInOtpId).Scan(&Login).Error
 	if err != nil {
 		err = errors.New("data not found")
 		return shared.Output{Error: err}
@@ -95,7 +96,7 @@ func (r *AuthRepositoryGorm) GetSecUserByID(secuserID string) shared.Output {
 	var secUser domain.SecUsers
 
 	err := r.db.Raw(`SELECT  * FROM security.sec_users
-	where sec_user_id = ? `, secuserID).Scan(&secUser).Error
+	where sec_user_id = ?`, secuserID).Scan(&secUser).Error
 	if err != nil {
 		return shared.Output{Error: err}
 	}
@@ -112,7 +113,7 @@ func (r *AuthRepositoryGorm) LoadActiveSecPatient(secUserId string) shared.Outpu
 	var secUserSignOtp domain.SecPatientSignInOtp
 
 	err := r.db.Raw(`SELECT  * FROM security.sec_patient_sign_in_otps
-	where sec_user_id = ?  and is_active = true and is_deleted = false order by created_on desc limit 1 `, secUserId).Scan(&secUserSignOtp).Error
+	where sec_user_id = ?  and is_active = true and is_deleted = false order by created_on desc limit 1`, secUserId).Scan(&secUserSignOtp).Error
 	if err != nil {
 		return shared.Output{Error: err}
 	}
@@ -144,7 +145,7 @@ func (r *AuthRepositoryGorm) GetSmsLog(mobilePhone string) shared.Output {
 
 func (r *AuthRepositoryGorm) SavePatientOtpSignIn(params *domain.SecPatientSignInOtp) shared.Output {
 
-	err := r.db.Save(params).Error
+	err := r.db.Create(params).Error
 	if err != nil {
 		return shared.Output{Error: err, Result: params}
 	}
@@ -161,7 +162,7 @@ func (r *AuthRepositoryGorm) UpdatePatientOtpSignIn(params *domain.SecPatientSig
 
 	dbArgsCustomer = append(dbArgsCustomer, time.Now().UTC())
 
-	sqlCustomer += " where sec_patient_sign_in_otp_id = ? "
+	sqlCustomer += " where sec_patient_sign_in_otp_id = ?"
 	dbArgsCustomer = append(dbArgsCustomer, params.SecPatientSignInOtpID)
 
 	r.db.Raw(sqlCustomer, dbArgsCustomer...).Scan(&response)
@@ -171,7 +172,7 @@ func (r *AuthRepositoryGorm) UpdatePatientOtpSignIn(params *domain.SecPatientSig
 
 func (r *AuthRepositoryGorm) SaveSmsLogs(params *domain.SmsLog) shared.Output {
 
-	err := r.db.Save(params).Error
+	err := r.db.Create(params).Error
 	if err != nil {
 		return shared.Output{Error: err, Result: params}
 	}
@@ -181,7 +182,7 @@ func (r *AuthRepositoryGorm) SaveSmsLogs(params *domain.SmsLog) shared.Output {
 
 func (r *AuthRepositoryGorm) SaveSmsLogMessages(params *domain.SmsLogMessage) shared.Output {
 
-	err := r.db.Save(params).Error
+	err := r.db.Create(params).Error
 	if err != nil {
 		return shared.Output{Error: err, Result: params}
 	}
@@ -194,7 +195,7 @@ func (r *AuthRepositoryGorm) FindBySecPatientSignInOtp(params *dto.LoginByPhoneO
 	var secPatientSignInOtp domain.SecPatientSignInOtp
 
 	r.db.Raw(`SELECT * FROM security.sec_patient_sign_in_otps
-	where sec_patient_sign_in_otp_id = ? and is_active = true and is_deleted = false `, params.SecPatientSignInOtpId).Scan(&secPatientSignInOtp)
+	where sec_patient_sign_in_otp_id = ? and is_active = true and is_deleted = false`, params.SecPatientSignInOtpId).Scan(&secPatientSignInOtp)
 
 	return shared.Output{Result: secPatientSignInOtp}
 }

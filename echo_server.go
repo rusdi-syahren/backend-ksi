@@ -13,8 +13,9 @@ import (
 	authUsecasePackage "github.com/Klinisia/backend-ksi/src/auth/v1/usecase"
 	"github.com/Klinisia/backend-ksi/src/shared/external"
 
-	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 // EchoServer structure
