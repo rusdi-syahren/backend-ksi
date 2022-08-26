@@ -45,7 +45,7 @@
 ROOT                    := $(PWD) # direktori folder
 GO_HTML_COV             := ./coverage.html #nama file coverage.html
 GO_TEST_OUTFILE         := ./c.out #output gotest
-GOLANG_DOCKER_IMAGE     := golang:1.17 #menjalankan go dengan versi tertentu
+GOLANG_DOCKER_IMAGE     := golang:1.14 #menjalankan go dengan versi tertentu
 CODECLIMATE_DEV			:= ${CODECLIMATE_DEV} #report id codeclimate
 CC_PREFIX				:= github.com/rusdi-syahren/backend-ksi #prefix url repo kita
 
