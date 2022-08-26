@@ -17,14 +17,14 @@ type AuthRepository struct {
 }
 
 // CheckUserDelete provides a mock function with given fields: _a0
-func (_m *AuthRepository) CheckUserDelete(_a0 *dto.LoginByPhoneRequest) bool {
+func (_m *AuthRepository) CheckUserDelete(_a0 *dto.LoginByPhoneRequest) int {
 	ret := _m.Called(_a0)
 
-	var r0 bool
-	if rf, ok := ret.Get(0).(func(*dto.LoginByPhoneRequest) bool); ok {
+	var r0 int
+	if rf, ok := ret.Get(0).(func(*dto.LoginByPhoneRequest) int); ok {
 		r0 = rf(_a0)
 	} else {
-		r0 = ret.Get(0).(bool)
+		r0 = ret.Get(0).(int)
 	}
 
 	return r0

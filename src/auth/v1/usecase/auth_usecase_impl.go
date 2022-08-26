@@ -34,7 +34,8 @@ func (u *AuthUsecaseImpl) SignInByPhonePassword(params *dto.LoginByPhoneRequest)
 
 	// check deleted user
 	checkUserDel := u.AuthRepositoryWrite.CheckUserDelete(params)
-	if checkUserDel == true {
+
+	if checkUserDel > 0 {
 		errResponse := shared.ErrorResponse{
 			Field:   "",
 			Code:    "SECURITY_USERPWD_INVALID",

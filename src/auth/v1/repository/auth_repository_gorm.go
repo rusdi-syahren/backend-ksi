@@ -52,23 +52,16 @@ func (r *AuthRepositoryGorm) LoginByPhoneOtp(params *dto.LoginByPhoneOtpRequest)
 }
 
 // CheckUserDelete function
-func (r *AuthRepositoryGorm) CheckUserDelete(params *dto.LoginByPhoneRequest) bool {
+func (r *AuthRepositoryGorm) CheckUserDelete(params *dto.LoginByPhoneRequest) int {
 
 	var results = struct {
 		Total uint
 	}{}
 
-	err := r.db.Raw(`SELECT count(*) total FROM security.sec_users
-	where mobile_phone = ? and is_active = false and is_deleted = true`, params.MobilePhone).Scan(&results).Error
-	if err != nil {
-		return false
-	}
+	r.db.Raw(`SELECT count(*) total FROM security.sec_users
+	where mobile_phone = ? and is_active = false and is_deleted = true`, params.MobilePhone).Scan(&results)
 
-	if results.Total > 0 {
-		return true
-	} else {
-		return false
-	}
+	return int(results.Total)
 
 }
 

@@ -11,7 +11,7 @@ type AuthRepository interface {
 	// login patient
 	LoginByPhone(*dto.LoginByPhoneRequest) shared.Output
 	LoginByPhoneOtp(*dto.LoginByPhoneOtpRequest) shared.Output
-	CheckUserDelete(*dto.LoginByPhoneRequest) bool
+	CheckUserDelete(*dto.LoginByPhoneRequest) int
 	CheckUserExist(*dto.LoginByPhoneRequest) shared.Output
 	LoadActiveSecPatient(string) shared.Output
 	CountSms(string) int

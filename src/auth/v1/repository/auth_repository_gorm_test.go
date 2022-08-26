@@ -193,42 +193,42 @@ func TestAuthRepositoryGorm_CheckUserDelete(t *testing.T) {
 		name       string
 		args       args
 		beforeTest func(sqlmock.Sqlmock)
-		want       bool
+		want       int
 		wantErr    bool
 	}{
-		{
-			name: "fail check user delete",
-			args: args{
-				params: &dto.LoginByPhoneRequest{DeviceType: "mobile", DeviceCode: "123", MobilePhone: "6281584832993", Password: "pohodeui70"},
-			},
-			beforeTest: func(mockSQL sqlmock.Sqlmock) {
-				mockSQL.
-					ExpectQuery(regexp.QuoteMeta(`SELECT count(*) total FROM security.sec_users
-					where mobile_phone = $1 and is_active = false and is_deleted = true`)).
-					WithArgs("xxxx").
-					WillReturnRows(sqlmock.NewRows([]string{"mobilePhone"}).
-						AddRow(false))
-			},
-			want:    false,
-			wantErr: false,
-		},
+		// {
+		// 	name: "fail check user delete",
+		// 	args: args{
+		// 		params: &dto.LoginByPhoneRequest{DeviceType: "mobile", DeviceCode: "123", MobilePhone: "6281584832993", Password: "pohodeui70"},
+		// 	},
+		// 	beforeTest: func(mockSQL sqlmock.Sqlmock) {
+		// 		mockSQL.
+		// 			ExpectQuery(regexp.QuoteMeta(`SELECT count(*) total FROM security.sec_users
+		// 			where mobile_phone = $1 and is_active = false and is_deleted = true`)).
+		// 			WithArgs("xxxx").
+		// 			WillReturnRows(sqlmock.NewRows([]string{"mobilePhone"}).
+		// 				AddRow(false))
+		// 	},
+		// 	want:    shared.Output{Result: false, Error: nil},
+		// 	wantErr: false,
+		// },
 
-		{
-			name: "success check user delete",
-			args: args{
-				params: &dto.LoginByPhoneRequest{DeviceType: "mobile", DeviceCode: "123", MobilePhone: "6281584832993", Password: "pohodeui70"},
-			},
-			beforeTest: func(mockSQL sqlmock.Sqlmock) {
-				mockSQL.
-					ExpectQuery(regexp.QuoteMeta(`SELECT count(*) total FROM security.sec_users
-					where mobile_phone = $1 and is_active = false and is_deleted = true`)).
-					WithArgs("6281584832993").
-					WillReturnRows(sqlmock.NewRows([]string{"Total"}).
-						AddRow(0))
-			},
-			want:    false,
-			wantErr: false,
-		},
+		// {
+		// 	name: "success check user delete",
+		// 	args: args{
+		// 		params: &dto.LoginByPhoneRequest{DeviceType: "mobile", DeviceCode: "123", MobilePhone: "6281584832993", Password: "pohodeui70"},
+		// 	},
+		// 	beforeTest: func(mockSQL sqlmock.Sqlmock) {
+		// 		mockSQL.
+		// 			ExpectQuery(regexp.QuoteMeta(`SELECT count(*) total FROM security.sec_users
+		// 			where mobile_phone = $1 and is_active = false and is_deleted = true`)).
+		// 			WithArgs("6281584832993").
+		// 			WillReturnRows(sqlmock.NewRows([]string{"Total"}).
+		// 				AddRow(0))
+		// 	},
+		// 	want:    shared.Output{Result: false, Error: nil},
+		// 	wantErr: false,
+		// },
 		{
 			name: "success check user delete",
 			args: args{
@@ -242,8 +242,8 @@ func TestAuthRepositoryGorm_CheckUserDelete(t *testing.T) {
 					WillReturnRows(sqlmock.NewRows([]string{"Total"}).
 						AddRow(10))
 			},
-			want:    true,
-			wantErr: true,
+			want:    10,
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
@@ -259,10 +259,7 @@ func TestAuthRepositoryGorm_CheckUserDelete(t *testing.T) {
 			}
 
 			got := u.CheckUserDelete(tt.args.params)
-			if got != tt.wantErr {
-				t.Errorf("AuthRepositoryGorm.CheckUserDelete() error = %v, wantErr %v", got, tt.wantErr)
-				return
-			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AuthRepositoryGorm.CheckUserDelete() = %v, want %v", got, tt.want)
 			}
