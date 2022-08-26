@@ -1,0 +1,41 @@
+name: Go
+on:
+  push: # ketika ada push ke branch main github actions berjalan branch bisa disesuaikan
+    branches: [master]
+  pull_request: # ketika ada pull request ke target branch yang dituju github actions di jalankan
+    branches: [master]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17
+      - name: Build
+        run: go build -v ./...
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ["1.17"]
+    steps:
+      - uses: actions/setup-go@v1
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/checkout@v2
+      - run: go test ./... -coverprofile=./coverage.out
+
+  coverage:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master #arahkan ke branch yang akan di ambil untuk coverage sebagai contoh main/master
+
+      - name: Coverage
+        run: make coverage # jalankan perintah coverage dengan bantuan Makefile sehingga menjadi one command
+        env:
+          CODECLIMATE_DEV: ${{ secrets.CODECLIMATE_DEV }} # nama secrets key yang kita definisikan tadi digithub jika sama tidak perlu diubah jika berbeda selahkan sesuaikan
