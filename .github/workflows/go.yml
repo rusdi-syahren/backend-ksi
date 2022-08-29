@@ -38,4 +38,4 @@ jobs:
       - name: Coverage
         run: make coverage # jalankan perintah coverage dengan bantuan Makefile sehingga menjadi one command
         env:
-          CODECLIMATE_DEV: ${{ secrets.CODECLIMATE_DEV }} # nama secrets key yang kita definisikan tadi digithub jika sama tidak perlu diubah jika berbeda selahkan sesuaikan
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }} # nama secrets key yang kita definisikan tadi digithub jika sama tidak perlu diubah jika berbeda selahkan sesuaikan

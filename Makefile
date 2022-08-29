@@ -46,7 +46,7 @@ ROOT                    := $(PWD)# direktori folder
 GO_HTML_COV             := ./coverage.html #nama file coverage.html
 GO_TEST_OUTFILE         := ./c.out #output gotest
 GOLANG_DOCKER_IMAGE     := golang:1.17 #menjalankan go dengan versi tertentu
-CODECLIMATE_DEV			:= ${CODECLIMATE_DEV} #report id codeclimate
+CC_TEST_REPORTER_ID			:= ${CC_TEST_REPORTER_ID} #report id codeclimate
 CC_PREFIX				:= github.com/rusdi-syahren/backend-ksi #prefix url repo kita
 
 .PHONY: clean build packing
@@ -60,7 +60,7 @@ coverage:
 	docker run -w /app -v ${ROOT}:/app ${GOLANG_DOCKER_IMAGE} chmod +x ./cc-test-reporter
 
 	# run before build
-	docker run -w /app -v ${ROOT}:/app -e CODECLIMATE_DEV=${CODECLIMATE_DEV} ${GOLANG_DOCKER_IMAGE} ./cc-test-reporter before-build
+	docker run -w /app -v ${ROOT}:/app -e CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID} ${GOLANG_DOCKER_IMAGE} ./cc-test-reporter before-build
 
 	# run testing
 	docker run -w /app -v ${ROOT}:/app ${GOLANG_DOCKER_IMAGE} go test ./... -coverprofile=${GO_TEST_OUTFILE}
@@ -72,7 +72,7 @@ ifdef prefix
 	$(eval PREFIX=${prefix})
 endif
 	# upload data to CC
-	docker run -w /app -v ${ROOT}:/app -e CODECLIMATE_DEV=${CODECLIMATE_DEV} ${GOLANG_DOCKER_IMAGE} ./cc-test-reporter after-build --prefix ${PREFIX}
+	docker run -w /app -v ${ROOT}:/app -e CC_TEST_REPORTER_ID=${CC_TEST_REPORTER_ID} ${GOLANG_DOCKER_IMAGE} ./cc-test-reporter after-build --prefix ${PREFIX}
 
 test:
 	@go test ./... -coverprofile=./coverage.out & go tool cover -html=./coverage.out
