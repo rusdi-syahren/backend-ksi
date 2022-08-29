@@ -46,7 +46,7 @@ ROOT                    := $(PWD)# direktori folder
 GO_HTML_COV             := ./coverage.html #nama file coverage.html
 GO_TEST_OUTFILE         := ./c.out #output gotest
 GOLANG_DOCKER_IMAGE     := golang:1.17 #menjalankan go dengan versi tertentu
-CC_TEST_REPORTER_ID			:= ${CC_TEST_REPORTER_ID} #report id codeclimate
+CC_TEST_REPORTER_ID		:= ${CC_TEST_REPORTER_ID} #report id codeclimate
 CC_PREFIX				:= github.com/rusdi-syahren/backend-ksi #prefix url repo kita
 
 .PHONY: clean build packing
@@ -79,9 +79,9 @@ test:
 	
 build:
 	@GOOS=linux GOARCH=amd64
-	@echo ">> Building GRPC..."
-	@go build -o phonebook-service-grpc ./cmd/grpc
+	@echo ">> Building Backend KSI..."
+	@go build -o backendKSI ./cmd/build
 	@echo ">> Finished"
 
 run:
-	@./phonebook-service-grpc
+	@./backendKSI
