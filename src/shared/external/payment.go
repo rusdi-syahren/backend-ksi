@@ -1,8 +1,8 @@
 package external
 
 import (
-	"github.com/Klinisia/backend-ksi/src/shared"
 	"github.com/labstack/echo/v4"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 )
 
 // Payment interface

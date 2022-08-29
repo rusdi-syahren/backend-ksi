@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Klinisia/backend-ksi/src/auth/v1/usecase"
 	"github.com/labstack/echo/v4"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/usecase"
 )
 
 func TestNewEchoHandler(t *testing.T) {

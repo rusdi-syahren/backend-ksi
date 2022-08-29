@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
-	"github.com/Klinisia/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/domain"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/dto"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 
 	// "github.com/jinzhu/gorm"
 

@@ -1,4 +1,4 @@
-module github.com/Klinisia/backend-ksi
+module github.com/rusdi-syahren/backend-ksi
 
 go 1.17
 

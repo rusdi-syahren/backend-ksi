@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Klinisia/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 
 	"github.com/labstack/echo/v4"
 )

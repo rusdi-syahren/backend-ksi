@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-	"github.com/Klinisia/backend-ksi/config"
-	"github.com/Klinisia/backend-ksi/config/database"
+	"github.com/rusdi-syahren/backend-ksi/config"
+	"github.com/rusdi-syahren/backend-ksi/config/database"
 )
 
 func main() {

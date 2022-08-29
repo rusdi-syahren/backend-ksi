@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/repository"
-	mockDB "github.com/Klinisia/backend-ksi/src/auth/v1/repository/mocks"
-	"github.com/Klinisia/backend-ksi/src/shared"
-	"github.com/Klinisia/backend-ksi/src/shared/external"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/domain"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/dto"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/repository"
+	mockDB "github.com/rusdi-syahren/backend-ksi/src/auth/v1/repository/mocks"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/shared/external"
 	"github.com/stretchr/testify/mock"
 )
 

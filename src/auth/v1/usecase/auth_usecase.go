@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
-	"github.com/Klinisia/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/dto"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 )
 
 // AuthUsecase interface

@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	shared "github.com/Klinisia/backend-ksi/src/shared"
+	shared "github.com/rusdi-syahren/backend-ksi/src/shared"
 	mock "github.com/stretchr/testify/mock"
 )
 

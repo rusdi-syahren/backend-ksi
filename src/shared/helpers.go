@@ -17,12 +17,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
 	"github.com/beevik/etree"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/maddevsio/fcm"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/domain"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/dto"
 	"golang.org/x/crypto/bcrypt"
 
 	humanize "github.com/dustin/go-humanize"

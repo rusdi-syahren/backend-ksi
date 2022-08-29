@@ -1,7 +1,7 @@
 package external
 
 import (
-	"github.com/Klinisia/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 )
 
 // Notif interface

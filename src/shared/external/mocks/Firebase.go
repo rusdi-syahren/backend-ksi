@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	external "github.com/Klinisia/backend-ksi/src/shared/external"
+	external "github.com/rusdi-syahren/backend-ksi/src/shared/external"
 	mock "github.com/stretchr/testify/mock"
 )
 

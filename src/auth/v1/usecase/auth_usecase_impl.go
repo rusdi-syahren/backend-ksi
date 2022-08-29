@@ -7,12 +7,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/Klinisia/backend-ksi/middleware"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/domain"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/dto"
-	"github.com/Klinisia/backend-ksi/src/auth/v1/repository"
-	"github.com/Klinisia/backend-ksi/src/shared"
-	"github.com/Klinisia/backend-ksi/src/shared/external"
+	"github.com/rusdi-syahren/backend-ksi/middleware"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/domain"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/dto"
+	"github.com/rusdi-syahren/backend-ksi/src/auth/v1/repository"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/shared/external"
 )
 
 // AuthUsecaseImpl struct

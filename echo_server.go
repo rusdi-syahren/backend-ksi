@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Klinisia/backend-ksi/config"
-	"github.com/Klinisia/backend-ksi/middleware"
 	"github.com/go-redis/redis"
+	"github.com/rusdi-syahren/backend-ksi/config"
+	"github.com/rusdi-syahren/backend-ksi/middleware"
 
-	authDeliveryPackage "github.com/Klinisia/backend-ksi/src/auth/v1/delivery"
-	authRepositoryPackage "github.com/Klinisia/backend-ksi/src/auth/v1/repository"
-	authUsecasePackage "github.com/Klinisia/backend-ksi/src/auth/v1/usecase"
-	"github.com/Klinisia/backend-ksi/src/shared/external"
+	authDeliveryPackage "github.com/rusdi-syahren/backend-ksi/src/auth/v1/delivery"
+	authRepositoryPackage "github.com/rusdi-syahren/backend-ksi/src/auth/v1/repository"
+	authUsecasePackage "github.com/rusdi-syahren/backend-ksi/src/auth/v1/usecase"
+	"github.com/rusdi-syahren/backend-ksi/src/shared/external"
 
 	// "github.com/jinzhu/gorm"
 	"github.com/labstack/echo/v4"

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Klinisia/backend-ksi/src/shared"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 )
 
 // SmsAcs struct

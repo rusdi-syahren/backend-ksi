@@ -8,9 +8,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/Klinisia/backend-ksi/src/shared"
 	"github.com/afex/hystrix-go/hystrix"
 	"github.com/labstack/echo/v4"
+	"github.com/rusdi-syahren/backend-ksi/src/shared"
 )
 
 // PaymentMidtrans struct
